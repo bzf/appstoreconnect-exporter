@@ -100,6 +100,10 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    app_store_connect (0.38.0)
+      activesupport (>= 6.0.0)
+      jwt (>= 1.4)
+      zeitwerk (>= 2.6.7)
     ast (2.4.2)
     base64 (0.2.0)
     benchmark (0.4.0)
@@ -114,6 +118,7 @@ GEM
     debug (1.10.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    dotenv (3.1.7)
     drb (2.2.1)
     erubi (1.13.1)
     et-orbi (1.2.11)
@@ -130,6 +135,8 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.9.1)
+    jwt (2.10.1)
+      base64
     language_server-protocol (3.17.0.3)
     logger (1.6.5)
     loofah (2.24.0)
@@ -163,6 +170,8 @@ GEM
     parser (3.3.7.0)
       ast (~> 2.4.1)
       racc
+    prometheus-client (4.2.3)
+      base64
     psych (5.2.3)
       date
       stringio
@@ -261,8 +270,11 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  app_store_connect
   brakeman
   debug
+  dotenv
+  prometheus-client
   puma (>= 5.0)
   rails!
   rubocop-rails-omakase
