@@ -4,3 +4,8 @@ production:
     queue: background
     args: []
     schedule: every hour
+  subscriptions_summary_report:
+    class: SubscriptionsSummaryDailyJob
+    queue: background
+    args: []
+    schedule: every hour
