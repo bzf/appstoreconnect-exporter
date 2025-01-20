@@ -33,7 +33,7 @@ class SalesSummaryDailyJob < ApplicationJob
   private
 
   def data
-    Rails.cache.fetch("sales_summary_daily", expires_in: 1.hour) do
+    Rails.cache.fetch("sales_summary_daily", expires_in: 30.minutes) do
       client.sales_reports(
         filter: {
           report_type: "SALES",
