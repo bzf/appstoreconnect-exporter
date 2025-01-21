@@ -10,8 +10,18 @@ default: &default
   timeout: 5000
 
 development:
-  <<: *default
-  database: storage/development.sqlite3
+  primary:
+    <<: *default
+    database: storage/development.sqlite3
+  queue:
+    <<: *default
+    database: storage/development_queue.sqlite3
+    migrations_paths: db/queue_migrate
+  cache:
+    <<: *default
+    database: /tmp/exporter-cache.sqlite3
+    migrations_paths: db/cache_migrate
+
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -30,8 +40,12 @@ test:
 production:
   primary:
     <<: *default
-    database: /tmp/appstoreconnect-exporter.sqlite3
+    database: /tmp/exporter.sqlite3
+  queue:
+    <<: *default
+    database: /tmp/exporter-queue.sqlite3
+    migrations_paths: db/queue_migrate
   cache:
     <<: *default
-    database: /tmp/appstoreconnect-exporter-cache.sqlite3
+    database: /tmp/exporter-cache.sqlite3
     migrations_paths: db/cache_migrate

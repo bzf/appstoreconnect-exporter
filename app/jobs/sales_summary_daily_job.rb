@@ -6,13 +6,15 @@ class SalesSummaryDailyJob < ApplicationJob
   APP_UNITS_TOTAL = Prometheus::Client.registry.gauge(
     :app_units_total,
     docstring: "Total app units",
-    labels: LABELS.uniq.map { _1.parameterize.underscore.to_sym }
+    labels: LABELS.uniq.map { _1.parameterize.underscore.to_sym },
+    store_settings: { aggregation: :most_recent }
   )
 
   DEVELOPER_PROCEEDS = Prometheus::Client.registry.gauge(
     :developer_proceeds,
     docstring: "Total app units",
-    labels: LABELS.uniq.map { _1.parameterize.underscore.to_sym }
+    labels: LABELS.uniq.map { _1.parameterize.underscore.to_sym },
+    store_settings: { aggregation: :most_recent }
   )
 
   def perform

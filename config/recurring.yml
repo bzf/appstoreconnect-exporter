@@ -1,11 +1,10 @@
-production:
-  sales_summary_report:
-    class: SalesSummaryReport
-    queue: background
-    args: []
-    schedule: every hour
-  subscriptions_summary_report:
-    class: SubscriptionsSummaryDailyJob
-    queue: background
-    args: []
-    schedule: every hour
+sales_summary_daily:
+  class: SalesSummaryDailyJob
+  queue: background
+  args: []
+  schedule: every hour
+subscriptions_summary:
+  class: SubscriptionsSummaryDailyJob
+  queue: background
+  args: []
+  schedule: every hour

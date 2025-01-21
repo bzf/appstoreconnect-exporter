@@ -6,7 +6,8 @@ class SubscriptionsSummaryDailyJob < ApplicationJob
   SUBSCRIPTIONS_TOTAL = Prometheus::Client.registry.gauge(
     :subscriptions_total,
     docstring: "Total subscriptions",
-    labels: LABELS.uniq.map { _1.parameterize.underscore.to_sym }
+    labels: LABELS.uniq.map { _1.parameterize.underscore.to_sym },
+    store_settings: { aggregation: :most_recent }
   )
 
   def perform
