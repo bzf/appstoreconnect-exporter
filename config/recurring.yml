@@ -8,3 +8,8 @@ subscriptions_summary:
   queue: background
   args: []
   schedule: every hour
+customer_reviews_daily:
+  class: CustomerReviewsDailyJob
+  queue: background
+  args: []
+  schedule: every hour

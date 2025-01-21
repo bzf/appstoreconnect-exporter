@@ -7,3 +7,4 @@ Rails.application.load_server
 
 SalesSummaryDailyJob.perform_later
 SubscriptionsSummaryDailyJob.perform_later
+CustomerReviewsDailyJob.perform_later
