@@ -1,34 +1,25 @@
 require "csv"
-require "prometheus/client"
 
 class SalesSummaryDailyJob < ApplicationJob
-  LABELS = [ "Provider", "SKU", "Version", "Begin Date", "End Date", "Country Code", "Customer Currency", "Promo Code", "Device" ].sort
-  APP_UNITS_TOTAL = Prometheus::Client.registry.gauge(
-    :app_units_total,
-    docstring: "Total app units",
-    labels: LABELS.uniq.map { _1.parameterize.underscore.to_sym },
-    store_settings: { aggregation: :most_recent }
-  )
-
-  DEVELOPER_PROCEEDS = Prometheus::Client.registry.gauge(
-    :developer_proceeds,
-    docstring: "Total app units",
-    labels: LABELS.uniq.map { _1.parameterize.underscore.to_sym },
-    store_settings: { aggregation: :most_recent }
-  )
-
   def perform
     result = CSV.parse(data, col_sep: "\t", headers: true).map(&:to_h).map(&:with_indifferent_access)
 
     result.each do |data|
-      APP_UNITS_TOTAL.set(
-        data["Units"].to_i,
-        labels: data.slice(*LABELS).transform_keys { _1.parameterize.underscore.to_sym }.symbolize_keys
+      summary = SalesSummaryDaily.find_or_initialize_by(
+        provider: data["Provider"],
+        sku: data["SKU"],
+        version: data["Version"],
+        date: Date.strptime(data["Begin Date"], "%m/%d/%Y"),
+        country_code: data["Country Code"],
+        customer_currency: data["Customer Currency"],
+        promo_code: data["Promo Code"],
+        device: data["Device"]
       )
-      DEVELOPER_PROCEEDS.set(
-        data["Developer Proceeds"].to_f,
-        labels: data.slice(*LABELS).transform_keys { _1.parameterize.underscore.to_sym }.symbolize_keys
-      )
+
+      summary.units = data["Units"].to_i
+      summary.developer_proceeds_in_cents = data["Developer Proceeds"].to_f * 100
+      summary.payload = data
+      summary.save!
     end
   end
 

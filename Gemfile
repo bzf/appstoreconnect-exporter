@@ -4,6 +4,7 @@ source "https://rubygems.org"
 gem "rails", github: "rails/rails", branch: "main"
 # Use sqlite3 as the database for Active Record
 gem "sqlite3", ">= 2.1"
+gem "pg"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 
@@ -15,13 +16,14 @@ gem "solid_cache"
 gem "solid_queue"
 
 gem "app_store_connect"
-gem "prometheus-client"
 
 # Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
 gem "thruster", require: false
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
+
+gem "dotenv"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -32,6 +34,4 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
-
-  gem "dotenv"
 end
