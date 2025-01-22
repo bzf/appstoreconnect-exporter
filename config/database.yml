@@ -40,7 +40,10 @@ test:
 production:
   primary:
     <<: *default
-    database: /tmp/exporter.sqlite3
+    adapter: postgresql
+    url: <%= ENV.fetch("DATABASE_URL", "")  %>
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+    timeout: 5000
   queue:
     <<: *default
     database: /tmp/exporter-queue.sqlite3

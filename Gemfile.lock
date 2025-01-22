@@ -170,8 +170,7 @@ GEM
     parser (3.3.7.0)
       ast (~> 2.4.1)
       racc
-    prometheus-client (4.2.3)
-      base64
+    pg (1.5.9)
     psych (5.2.3)
       date
       stringio
@@ -274,7 +273,7 @@ DEPENDENCIES
   brakeman
   debug
   dotenv
-  prometheus-client
+  pg
   puma (>= 5.0)
   rails!
   rubocop-rails-omakase

@@ -1,31 +1,23 @@
 require "ostruct"
-require "prometheus/client"
 
 class CustomerReviewsDailyJob < ApplicationJob
-  LABELS = [ :app_id, :app_name, :rating ]
-  SUBSCRIPTIONS_TOTAL = Prometheus::Client.registry.gauge(
-    :app_ratings_total,
-    docstring: "Number of App Store reviews with a given rating",
-    labels: LABELS,
-    store_settings: { aggregation: :most_recent }
-  )
-
   def perform
     apps.map do |app|
-      customer_reviews(app.id)
-        .map { _1.dig(:attributes, :rating) }
-        .tally
-        .with_defaults(1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0)
-        .each do |rating, count|
-          SUBSCRIPTIONS_TOTAL.set(
-            count,
-            labels: {
-              app_id: app.id,
-              app_name: app.name,
-              rating:
-            }
+      customer_reviews(app.id).each do |review|
+          foo = CustomerReview.find_or_initialize_by(id: review[:id])
+          foo.assign_attributes(
+            app_id: app.id,
+            app_name: app.name,
+            rating: review.dig(:attributes, :rating),
+            title: review.dig(:attributes, :title),
+            nickname: review.dig(:attributes, :reviewer_nickname),
+            territory: review.dig(:attributes, :territory),
+            body: review.dig(:attributes, :body),
+            review_date: review.dig(:attributes, :created_date),
           )
-        end
+
+          foo.save!
+      end
     end
   end
 

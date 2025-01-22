@@ -1,0 +1,2 @@
+class SubscriptionSummary < ApplicationRecord
+end

@@ -1,23 +1,31 @@
 require "csv"
-require "prometheus/client"
 
 class SubscriptionsSummaryDailyJob < ApplicationJob
-  LABELS = [ "App Name", "App Apple ID", "Active Standard Price Subscriptions", "Active Free Trial Introductory Offer Subscriptions", "Subscription Name", "Standard Subscription Duration", "Customer Price", "Customer Currency", "Developer Proceeds", "Proceeds Currency", "Device", "Country" ].sort
-  SUBSCRIPTIONS_TOTAL = Prometheus::Client.registry.gauge(
-    :subscriptions_total,
-    docstring: "Total subscriptions",
-    labels: LABELS.uniq.map { _1.parameterize.underscore.to_sym },
-    store_settings: { aggregation: :most_recent }
-  )
-
   def perform
     result = CSV.parse(data, col_sep: "\t", headers: true).map(&:to_h).map(&:with_indifferent_access)
 
     result.each do |data|
-      SUBSCRIPTIONS_TOTAL.set(
-        data["Subscribers"].to_i,
-        labels: data.slice(*LABELS).transform_keys { _1.parameterize.underscore.to_sym }.symbolize_keys
+      summary = SubscriptionSummary.find_or_initialize_by(
+        app_id: data["App Apple ID"],
+        app_name: data["App Name"],
+        subscription_name: data["Subscription Name"],
+        standard_subscription_duration: data["Standard Subscription Duration"],
+        customer_price_in_cents: data["Customer Price"].to_f * 100,
+        customer_currency: data["Customer Currency"],
+        proceeds_currency: data["Proceeds Currency"],
+        device: data["Device"],
+        country: data["Country"],
+        date: Date.today,
       )
+
+      summary.assign_attributes(
+        active_standard_price_subscriptions: data["Active Standard Price Subscriptions"],
+        active_free_trial_introductory_offer_subscriptions: data["Active Free Trial Introductory Offer Subscriptions"],
+        developer_proceeds_in_cents: data["Developer Proceeds"].to_f * 100,
+        subscriptions_total: data["Subscribers"].to_i
+      )
+
+      summary.save!
     end
   end
 
