@@ -1,7 +1,8 @@
 require "csv"
 
 class SalesSummaryDailyJob < ApplicationJob
-  def perform
+  def perform(date = Date.yesterday)
+    @date = date
     result = CSV.parse(data, col_sep: "\t", headers: true).map(&:to_h).map(&:with_indifferent_access)
 
     result.each do |data|
@@ -26,13 +27,14 @@ class SalesSummaryDailyJob < ApplicationJob
   private
 
   def data
-    Rails.cache.fetch("sales_summary_daily", expires_in: 30.minutes) do
+    Rails.cache.fetch("sales_summary_daily/#{@date}", expires_in: 30.minutes) do
       client.sales_reports(
         filter: {
           report_type: "SALES",
           report_sub_type: "SUMMARY",
           frequency: "DAILY",
-          vendor_number: VENDOR_ID
+          vendor_number: VENDOR_ID,
+          report_date: @date
         }
       )
     end

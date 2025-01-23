@@ -1,7 +1,8 @@
 require "csv"
 
 class SubscriptionsSummaryDailyJob < ApplicationJob
-  def perform
+  def perform(date = Date.yesterday)
+    @date = date
     result = CSV.parse(data, col_sep: "\t", headers: true).map(&:to_h).map(&:with_indifferent_access)
 
     result.each do |data|
@@ -15,7 +16,7 @@ class SubscriptionsSummaryDailyJob < ApplicationJob
         proceeds_currency: data["Proceeds Currency"],
         device: data["Device"],
         country: data["Country"],
-        date: Date.today,
+        date: date.to_date,
       )
 
       summary.assign_attributes(
@@ -32,14 +33,15 @@ class SubscriptionsSummaryDailyJob < ApplicationJob
   private
 
   def data
-    Rails.cache.fetch("subscriptions_summary_daily", expires_in: 30.minutes) do
+    Rails.cache.fetch("subscriptions_summary_daily/#{@date}", expires_in: 30.minutes) do
       client.sales_reports(
         filter: {
           report_type: "SUBSCRIPTION",
           report_sub_type: "SUMMARY",
           frequency: "DAILY",
           vendor_number: VENDOR_ID,
-          version: "1_4"
+          version: "1_4",
+          report_date: @date
         }
       )
     end
